@@ -1,0 +1,164 @@
+# HypeShelf – Cursor Rules
+# ============================================================
+# These rules govern all AI-assisted code generation in this
+# project. They encode conventions, security policies, and
+# architectural decisions so every file stays consistent.
+# ============================================================
+
+## 1. Project Identity
+- Project name : HypeShelf
+- Stack        : Next.js 14 (App Router), Clerk, Convex, TypeScript
+- Node version : 20 LTS
+- Package mgr  : pnpm
+
+## 2. Language & TypeScript
+- All files MUST be TypeScript (.ts / .tsx). Never emit plain .js files.
+- Enable strict mode. Never use `any`; prefer `unknown` with type guards.
+- Use explicit return types on all exported functions and React components.
+- Prefer `interface` for object shapes, `type` for unions/intersections.
+- Use `satisfies` operator when checking literals against a type without widening.
+- No `@ts-ignore`. If a third-party type is broken, use `@ts-expect-error` with a comment.
+
+## 3. File & Folder Structure
+Follow this layout exactly:
+
+```
+src/
+  app/                        # Next.js App Router pages & layouts
+    (public)/                 # Route group – unauthenticated
+      page.tsx                # Landing / public shelf
+    (auth)/                   # Route group – Clerk-protected
+      dashboard/
+        page.tsx
+      layout.tsx              # Auth layout with <ClerkProvider>
+    api/                      # Route handlers (if needed)
+    layout.tsx                # Root layout
+    globals.css
+  components/
+    ui/                       # Headless / primitive components
+    features/                 # Feature-specific composed components
+      recommendations/
+      auth/
+  convex/                     # All Convex backend files
+    schema.ts
+    recommendations.ts        # Queries & mutations
+    users.ts
+    _generated/               # Auto-generated – never edit
+  lib/
+    utils.ts
+    roles.ts                  # Role helper functions
+    validations.ts            # Zod schemas
+  hooks/                      # Custom React hooks
+  types/                      # Shared TypeScript types & enums
+```
+
+- Group by feature, not by layer, inside `components/`.
+- Never import from `_generated/` directly; use Convex's typed helpers.
+
+## 4. Naming Conventions
+- React components   : PascalCase  (`RecommendationCard.tsx`)
+- Hooks              : camelCase, prefix `use` (`useCurrentRole.ts`)
+- Convex functions   : camelCase (`listRecommendations`, `deleteRecommendation`)
+- Constants          : SCREAMING_SNAKE_CASE (`MAX_BLURB_LENGTH`)
+- CSS classes        : Tailwind utility classes only; no custom class names unless absolutely necessary
+- Files              : kebab-case for non-component files (`recommendation-schema.ts`)
+
+## 5. React & Next.js Patterns
+- Prefer React Server Components (RSC) by default.
+- Only add `"use client"` when the component requires:
+  - Browser APIs
+  - React state (`useState`, `useReducer`)
+  - React context consumers
+  - Event handlers that cannot be serialised
+- Never use `"use client"` at layout level unless unavoidable.
+- Data fetching: use Convex `useQuery` inside client components; server components may use `fetchQuery` from `convex/nextjs`.
+- Loading states: every `useQuery` result MUST handle `undefined` (loading) and potential errors gracefully.
+- Avoid prop drilling beyond 2 levels; use context or Convex queries instead.
+- Co-locate a component's types, sub-components, and hooks in the same directory when they are not shared.
+
+## 6. Convex Rules
+- ALL data mutations go through Convex mutations — never write to the DB from a Next.js API route or server action.
+- Every Convex function MUST have:
+  - An explicit `args` validator using `v.*` helpers from `convex/values`.
+  - An explicit `returns` validator (or `v.null()` for void).
+- Use `internalMutation` / `internalQuery` for functions not callable from the client.
+- Authorization checks MUST be the first logic inside any mutation:
+  ```ts
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) throw new ConvexError("Unauthenticated");
+  ```
+- Use `ctx.db.query().withIndex()` rather than full-table scans wherever an index exists.
+- Document every Convex function with a JSDoc comment describing: purpose, auth requirement, and side effects.
+
+## 7. Authentication & Authorization (Clerk + RBAC)
+- Clerk is the single source of truth for identity.
+- Roles are stored in Clerk `publicMetadata.role` as `"admin"` | `"user"`.
+- The role is synced to Convex via a Clerk webhook on user creation/update.
+- Convex mutations MUST re-read the role from the DB (never trust client-passed role strings).
+- Role checks MUST live in `lib/roles.ts` — no inline string comparisons scattered across files:
+  ```ts
+  // Good
+  import { isAdmin } from "@/lib/roles";
+  // Bad
+  if (role === "admin") { ... }
+  ```
+- Client-side role gating is UX only — the real guard is always the Convex function.
+- Never expose admin-only mutation names in client bundles that regular users receive (use `internalMutation` or server actions wrapped with role checks).
+
+## 8. Validation
+- Use Zod for all client-side form validation.
+- Convex `args` validators serve as the server-side schema — keep them in sync with Zod schemas in `lib/validations.ts`.
+- Never trust client input in Convex functions even if Zod validated it on the client.
+- Constants for limits (e.g., `MAX_TITLE_LENGTH = 120`) must be defined once in `lib/validations.ts` and imported everywhere.
+
+## 9. Error Handling
+- Convex mutations throw `ConvexError` (not plain `Error`) for user-facing errors.
+- Next.js pages use `error.tsx` / `not-found.tsx` for graceful degradation.
+- Never swallow errors silently (`catch (e) {}`). At minimum, `console.error` with context.
+- API routes return typed error responses `{ error: string }` with correct HTTP status codes.
+
+## 10. Styling (Tailwind CSS)
+- Use Tailwind CSS v3 utility classes.
+- Mobile-first: always write base styles for mobile, add `md:` / `lg:` breakpoints.
+- Use `cn()` utility from `lib/utils.ts` (clsx + tailwind-merge) for conditional class merging.
+- No `style={{}}` inline styles unless for dynamic values impossible with Tailwind.
+- Color palette: stick to the design spec tokens. Do not introduce ad-hoc colors.
+- Dark mode: implement via Tailwind `dark:` variant with `class` strategy.
+
+## 11. Security Checklist (apply to every PR)
+- [ ] No secrets or API keys in source code. Use `.env.local` (git-ignored).
+- [ ] All Convex mutations verify `ctx.auth.getUserIdentity()` before acting.
+- [ ] Ownership checks: confirm `recommendation.userId === identity.subject` before user-level deletes.
+- [ ] No `dangerouslySetInnerHTML` unless content is sanitised.
+- [ ] External links use `rel="noopener noreferrer"`.
+- [ ] Convex `args` validators reject unexpected fields (use exact validators).
+- [ ] Rate limiting considered for public-facing mutations.
+
+## 12. Testing Conventions
+- Unit tests: Vitest, co-located as `*.test.ts(x)`.
+- Integration / E2E: Playwright under `e2e/`.
+- Test naming: `describe("ComponentName")` → `it("should <expected behaviour> when <condition>")`.
+- Convex function logic should be unit-tested by extracting pure helper functions.
+- Minimum coverage targets: 80% for `lib/` utilities, 60% for Convex functions.
+
+## 13. Git & Commits
+- Commit messages follow Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`.
+- Never commit directly to `main`. All work via feature branches with PRs.
+- PR titles match the commit convention.
+- `.env.local`, `node_modules/`, `.next/`, `convex/_generated/` are all git-ignored.
+
+## 14. Documentation
+- Every exported function, hook, and component gets a JSDoc comment (purpose, params, return value).
+- Inline comments explain *why*, not *what*.
+- Update `ARCHITECTURE.md` when adding new integrations or changing data flow.
+- Update `PRD.md` acceptance criteria when scope changes.
+
+## 15. Code Generation Defaults (for Cursor AI)
+When generating code in this project:
+- Assume pnpm is the package manager.
+- Import paths use `@/` alias (mapped to `src/`).
+- Always generate the TypeScript type alongside any new Convex schema field.
+- Prefer named exports over default exports for components (except Next.js pages).
+- When scaffolding a Convex function, include the full `args` + `returns` validators.
+- When scaffolding a form, wire it to a Zod schema and a Convex mutation via `useMutation`.
+- Suggest index additions to `schema.ts` when writing queries that filter by a field.
