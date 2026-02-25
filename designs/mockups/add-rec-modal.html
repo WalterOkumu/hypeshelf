@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HypeShelf – Add Recommendation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#fff; --fg:#0f172a; --muted:#64748b; --primary:#6366f1; --border:#e2e8f0; --radius:12px; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; margin: 0; background: rgba(0,0,0,0.5); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal { background: var(--bg); max-width: 32rem; width: 100%; border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .modal h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+    .form { display: flex; flex-direction: column; gap: 1rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+    input, select, textarea { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.875rem; font-family: inherit; }
+    textarea { min-height: 80px; resize: vertical; }
+    .counter { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+    .actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .btn-primary { flex: 1; padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn-ghost { padding: 0.5rem 1rem; background: transparent; border: none; color: var(--muted); font-weight: 500; cursor: pointer; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <h2 id="modal-title">Add Recommendation</h2>
+    <form class="form">
+      <div>
+        <label for="title">Title</label>
+        <input id="title" type="text" name="title" required maxlength="120" placeholder="Movie title" />
+        <p class="counter" aria-live="polite">0 / 120</p>
+      </div>
+      <div>
+        <label for="genre">Genre</label>
+        <select id="genre" name="genre" required>
+          <option value="">Select a genre</option>
+          <option value="horror">Horror</option>
+          <option value="action">Action</option>
+          <option value="comedy">Comedy</option>
+          <option value="drama">Drama</option>
+          <option value="sci-fi">Sci-Fi</option>
+          <option value="thriller">Thriller</option>
+          <option value="documentary">Documentary</option>
+          <option value="animation">Animation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="link">Link (optional)</label>
+        <input id="link" type="url" name="link" placeholder="https://..." />
+      </div>
+      <div>
+        <label for="blurb">Blurb</label>
+        <textarea id="blurb" name="blurb" required maxlength="300" placeholder="Why do you recommend it?"></textarea>
+        <p class="counter" aria-live="polite">0 / 300</p>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HypeShelf – Landing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #0f172a;
+      --muted: #64748b;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --border: #e2e8f0;
+      --card: #f8fafc;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: var(--fg); }
+    .header {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      max-width: 1024px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 120px;
+    }
+    .btn-ghost {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .btn-ghost:hover { background: var(--card); }
+    .hero {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 6rem 1rem 4rem;
+      text-align: center;
+    }
+    .hero .logo { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+    .tagline { font-size: 1.125rem; color: var(--muted); margin-bottom: 2rem; }
+    .btn-primary {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .section {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 1rem 3rem;
+    }
+    .section h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
+    .badges { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .badge { font-size: 0.75rem; font-weight: 500; padding: 0.25rem 0.5rem; border-radius: 6px; }
+    .badge-genre { background: #e2e8f0; color: #475569; }
+    .badge-staff { background: #fef3c7; color: #b45309; }
+    .card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .card-blurb { font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-link { font-size: 0.875rem; color: var(--primary); }
+    .card-footer { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); }
+    .avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="logo">HypeShelf</span>
+    <button type="button" class="btn-ghost">Sign in</button>
+  </header>
+  <section class="hero">
+    <span class="logo">HypeShelf</span>
+    <p class="tagline">Collect and share the stuff you're hyped about.</p>
+    <a href="#" class="btn-primary">Sign in to add yours →</a>
+  </section>
+  <section class="section">
+    <h2>Latest Picks</h2>
+    <div class="grid">
+      <article class="card">
+        <div class="badges"><span class="badge badge-staff">⭐ Staff Pick</span><span class="badge badge-genre">Sci-Fi</span></div>
+        <h3 class="card-title">Dune: Part Two</h3>
+        <p class="card-blurb">Epic continuation. Stunning visuals and a story that earns its length. One of the best blockbusters in years.</p>
+        <a href="#" class="card-link" rel="noopener noreferrer" target="_blank">Watch here</a>
+        <div class="card-footer"><span class="avatar"></span> Alex · 2h ago</div>
+      </article>
+      <article class="card">
+        <div class="badges"><span class="badge badge-genre">Drama</span></div>
+        <h3 class="card-title">Past Lives</h3>
+        <p class="card-blurb">Quiet and moving. Two childhood friends reconnect as adults. Beautifully understated.</p>
+        <div class="card-footer"><span class="avatar"></span> Sam · 5h ago</div>
+      </article>
+      <article class="card">
+        <div class="badges"><span class="badge badge-genre">Horror</span></div>
+        <h3 class="card-title">Talk to Me</h3>
+        <p class="card-blurb">Fresh take on possession. Tense and inventive. The hand is iconic.</p>
+        <a href="#" class="card-link" rel="noopener noreferrer" target="_blank">Watch here</a>
+        <div class="card-footer"><span class="avatar"></span> Jordan · 1d ago</div>
+      </article>
+    </div>
+  </section>
+</body>
+</html>
