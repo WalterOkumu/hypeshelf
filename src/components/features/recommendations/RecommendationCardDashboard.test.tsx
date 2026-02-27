@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import type { Id } from "convex/_generated/dataModel";
@@ -80,7 +81,7 @@ describe("RecommendationCardDashboard RBAC UI", () => {
     });
 
     expect(screen.getByText(/Delete/i)).toBeInTheDocument();
-    const staffPickButton = screen.getByText(/Staff Pick/i);
+    const staffPickButton = screen.getByRole("button", { name: /Staff Pick/i });
     expect(staffPickButton).toBeInTheDocument();
     expect(staffPickButton).toHaveAttribute("aria-pressed", "false");
   });
@@ -92,7 +93,7 @@ describe("RecommendationCardDashboard RBAC UI", () => {
       overrides: { isStaffPick: true },
     });
 
-    const staffPickButton = screen.getByText(/Staff Pick/i);
+    const staffPickButton = screen.getByRole("button", { name: /Staff Pick/i });
     expect(staffPickButton).toHaveAttribute("aria-pressed", "true");
   });
 
