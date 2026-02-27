@@ -1,12 +1,12 @@
 import { httpRouter } from "convex/server";
-import { httpAction, type HttpActionCtx } from "./_generated/server";
+import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { Webhook } from "svix";
 
 /**
  * Clerk webhook handler. Verifies svix signature and syncs user.created / user.updated to Convex users table.
  */
-const handleClerkWebhook = httpAction(async (ctx: HttpActionCtx, request: Request) => {
+const handleClerkWebhook = httpAction(async (ctx: ActionCtx, request: Request) => {
   const secret = process.env.CLERK_WEBHOOK_SECRET;
   if (!secret) {
     return new Response("Missing CLERK_WEBHOOK_SECRET", { status: 500 });
@@ -59,7 +59,7 @@ const handleClerkWebhook = httpAction(async (ctx: HttpActionCtx, request: Reques
  * Seed endpoint. GET /seed?secret=YOUR_SEED_SECRET runs the sample data seed.
  * Set SEED_SECRET in Convex Dashboard → Settings → Environment Variables.
  */
-const handleSeed = httpAction(async (ctx: HttpActionCtx, request: Request) => {
+const handleSeed = httpAction(async (ctx: ActionCtx, request: Request) => {
   if (request.method !== "GET") {
     return new Response("Method not allowed", { status: 405 });
   }

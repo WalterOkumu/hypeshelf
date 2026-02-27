@@ -1,5 +1,5 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { query, mutation, type MutationCtx } from "./_generated/server";
+import { v, Infer } from "convex/values";
 import { ConvexError } from "convex/values";
 import { GENRES } from "./schema";
 
@@ -19,14 +19,7 @@ const recommendationWithUser = v.object({
   imageUrl: v.string(),
 });
 
-async function getOrCreateUserForIdentity(
-  ctx: Parameters<typeof mutation>[0]["handler"] extends (
-    ctx: infer C,
-    ...args: any[]
-  ) => any
-    ? C
-    : never
-) {
+async function getOrCreateUserForIdentity(ctx: MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new ConvexError("Unauthenticated");
 
@@ -39,10 +32,7 @@ async function getOrCreateUserForIdentity(
     return existing;
   }
 
-  const displayName =
-    (identity.name as string | undefined) && identity.name.trim().length > 0
-      ? identity.name
-      : "User";
+  const displayName = identity.name?.trim() || "User";
   const imageUrl =
     ((identity as any).pictureUrl as string | undefined) ??
     ((identity as any).imageUrl as string | undefined) ??
@@ -75,7 +65,7 @@ export const listLatestPublic = query({
       .withIndex("by_createdAt")
       .order("desc")
       .take(count);
-    const withUser: typeof recommendationWithUser._type[] = [];
+    const withUser: Infer<typeof recommendationWithUser>[] = [];
     for (const rec of recs) {
       const user = await ctx.db.get(rec.userId);
       withUser.push({
@@ -103,7 +93,7 @@ export const listAll = query({
       .withIndex("by_createdAt")
       .order("desc")
       .collect();
-    const withUser: typeof recommendationWithUser._type[] = [];
+    const withUser: Infer<typeof recommendationWithUser>[] = [];
     for (const rec of recs) {
       const user = await ctx.db.get(rec.userId);
       withUser.push({
