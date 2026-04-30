@@ -12,7 +12,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.38.2",
+    "@clerk/nextjs": "^6.39.3",
     "@hookform/resolvers": "^5.2.2",
     "clsx": "^2.1.1",
     "convex": "^1.32.0",
